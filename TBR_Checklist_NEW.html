@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TBR checklist</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23f5f2eb'/%3E%3Crect x='18' y='22' width='64' height='9' rx='4.5' fill='%23c0392b'/%3E%3Ctext x='50' y='67' font-family='Arial Black,Arial,sans-serif' font-weight='900' font-size='36' fill='%23111' text-anchor='middle'%3ETBR%3C/text%3E%3Crect x='18' y='72' width='64' height='9' rx='4.5' fill='%232e7d4f'/%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f0ece4;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: #1a1a1a;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  .outer {
+    background: #faf8f3;
+    border: 1px solid #e2ddd5;
+    border-radius: 16px;
+    padding: 20px 22px 24px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .header-left h1 { font-size: 20px; font-weight: 700; color: #111; letter-spacing: -0.01em; }
+  .header-left .sub { font-size: 12px; color: #9e9890; margin-top: 3px; }
+  .clock-area { text-align: right; }
+  #clock {
+    font-size: 28px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #111; letter-spacing: 0.02em; line-height: 1;
+    transition: color 0.3s;
+  }
+  #clock.danger { color: #d93025 !important; }
+  .clock-label { font-size: 11px; color: #9e9890; margin-top: 3px; }
+  #no-trade-banner {
+    font-size: 10px; font-weight: 700; color: #d93025;
+    letter-spacing: 0.08em; margin-top: 3px;
+    display: none; animation: blink 0.9s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── SECTION CARD ──────────────────────── */
+  .section {
+    background: #fff; border: 1px solid #e8e4dc;
+    border-radius: 12px; padding: 16px 18px;
+    margin-bottom: 10px; overflow: hidden;
+  }
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    color: #9e9890; text-transform: uppercase; margin-bottom: 12px;
+  }
+
+  /* ── SWEEP ─────────────────────────────── */
+  .sweep-row { display: flex; gap: 10px; }
+  .sweep-btn {
+    flex: 1; padding: 14px 12px;
+    border: 1.5px solid #e2ddd5; border-radius: 10px;
+    background: #faf8f3; cursor: pointer; text-align: center;
+    transition: all 0.15s; user-select: none;
+  }
+  .sweep-btn:hover { border-color: #c5bfb5; }
+  .sweep-btn .sw-title { font-size: 14px; font-weight: 700; color: #333; display: block; }
+  .sweep-btn .sw-sub  { font-size: 11px; color: #9e9890; margin-top: 3px; display: block; }
+  .sweep-btn.long-active  { border-color: #2e7d4f; background: #f0faf4; }
+  .sweep-btn.long-active .sw-title { color: #2e7d4f; }
+  .sweep-btn.short-active { border-color: #c0392b; background: #fdf5f4; }
+  .sweep-btn.short-active .sw-title { color: #c0392b; }
+
+  /* ── FIELDS ────────────────────────────── */
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .fg-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+    color: #9e9890; text-transform: uppercase; margin-bottom: 8px; display: block;
+  }
+  .field-row { display: flex; align-items: center; margin-bottom: 6px; }
+  .field-row:last-child { margin-bottom: 0; }
+  .field-row label { font-size: 13px; color: #555; width: 72px; flex-shrink: 0; }
+  .field-row input {
+    flex: 1; background: #f7f5f0; border: 1px solid #e2ddd5;
+    border-radius: 7px; color: #111; font-size: 13px;
+    padding: 6px 10px; outline: none; transition: border-color 0.15s;
+  }
+  .field-row input:focus { border-color: #a09890; }
+  .field-row input::placeholder { color: #c5bfb5; }
+
+  /* ── TAKE PROFITS ──────────────────────── */
+  .tp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .be-btn {
+    padding: 5px 16px; border-radius: 7px;
+    border: 1.5px solid #e2ddd5; background: #f7f5f0;
+    color: #666; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
+  }
+  .be-btn.active { background: #fff3cd; border-color: #e6ac00; color: #8a6600; }
+
+  .tp-row-item { display: flex; align-items: center; margin-bottom: 7px; }
+  .tp-row-item:last-child { margin-bottom: 0; }
+  .tp-lbl { font-size: 13px; color: #555; width: 72px; flex-shrink: 0; }
+  .tp-lbl.dol-lbl { color: #7c5cbf; font-weight: 700; }
+
+  .tp-input-wrap { flex: 1; display: flex; align-items: center; gap: 5px; }
+  .tp-input-wrap input {
+    flex: 1; background: #f7f5f0; border: 1px solid #e2ddd5;
+    border-radius: 7px; color: #111; font-size: 13px;
+    padding: 6px 10px; outline: none; transition: border-color 0.15s; min-width: 0;
+  }
+  .tp-input-wrap input:focus { border-color: #a09890; }
+  .tp-input-wrap input::placeholder { color: #c5bfb5; }
+  .tp-input-wrap input[readonly] { color: #7c5cbf; background: #f5f0ff; border-color: #d4c5f0; }
+
+  /* Link buttons */
+  .link-btn {
+    padding: 3px 7px; border-radius: 5px;
+    border: 1px solid #e2ddd5; background: #f7f5f0;
+    color: #888; font-size: 10px; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .link-btn:hover { border-color: #a09890; color: #444; }
+  .link-btn.active-green  { background: #2e7d4f; border-color: #2e7d4f; color: #fff; }
+  .link-btn.active-purple { background: #7c5cbf; border-color: #7c5cbf; color: #fff; }
+  .link-btn.hidden { display: none; }
+
+  .tp-rr {
+    font-size: 12px; color: #9e9890;
+    width: 40px; text-align: right; flex-shrink: 0;
+    font-variant-numeric: tabular-nums; margin-left: 6px;
+  }
+
+  /* Summary row */
+  .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+  .sum-box {
+    background: #f7f5f0; border: 1px solid #e2ddd5;
+    border-radius: 8px; padding: 8px 10px; text-align: center;
+  }
+  .sum-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: #9e9890; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .sum-val  { font-size: 14px; font-weight: 700; color: #333; font-variant-numeric: tabular-nums; }
+
+  /* ── LIQUIDITY ─────────────────────────── */
+  .liq-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .liq-hint { font-size: 10px; color: #b0aba3; text-transform: none; letter-spacing: 0; }
+  .liq-group-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    color: #b0aba3; text-transform: uppercase;
+    margin-bottom: 7px; margin-top: 12px;
+  }
+  .liq-group-label:first-of-type { margin-top: 0; }
+  .liq-items { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* DEFAULT state: plain, bordered */
+  .liq-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 11px 5px 8px;
+    border: 1px solid #e2ddd5; border-radius: 7px;
+    background: #faf8f3; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: #444;
+    user-select: none; transition: all 0.15s; white-space: nowrap;
+  }
+  .liq-item:hover { border-color: #c5bfb5; background: #f5f2eb; }
+  .liq-item .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #d4cfc8; flex-shrink: 0; transition: background 0.15s;
+  }
+  .liq-item .dash { color: #c5bfb5; font-size: 11px; margin-left: 2px; }
+
+  /* SWEPT state: amber highlight (like old version) */
+  .liq-item.swept {
+    background: #fef3c7;
+    border-color: #f0c040;
+    color: #7a5200;
+  }
+  .liq-item.swept .dot { background: #e07820; }
+  .liq-item.swept .dash { color: #e07820; }
+  .liq-item.swept:hover { background: #fde68a; border-color: #e6ac00; }
+
+  /* ── CHECKLIST ─────────────────────────── */
+  .chk-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 8px; border-radius: 7px; margin-bottom: 3px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .chk-item:last-child { margin-bottom: 0; }
+  .chk-item input[type=checkbox] {
+    margin-top: 2px; width: 15px; height: 15px;
+    accent-color: #3a7d5c; cursor: pointer; flex-shrink: 0;
+  }
+  .chk-item label { font-size: 13px; color: #333; cursor: pointer; line-height: 1.4; }
+
+  /* CHECKED = green highlight, no strikethrough */
+  .chk-item.done { background: #eaf5ee; }
+  .chk-item.done label { color: #2e7d4f; font-weight: 600; }
+
+  /* Invalidation row */
+  .chk-item.invalid-item label { color: #c0392b; }
+  .chk-item.invalid-item.done { background: #fdf1f0; }
+  .chk-item.invalid-item.done label { color: #c0392b; font-weight: 700; }
+  .warn-icon { font-size: 13px; flex-shrink: 0; margin-top: 2px; }
+
+  /* Divider inside section */
+  .section-divider { border: none; border-top: 1px solid #f0ece4; margin: 14px 0; }
+
+  /* ── RESULT BUTTONS ────────────────────── */
+  .result-btns { display: flex; gap: 10px; margin-bottom: 12px; }
+  .result-btn {
+    flex: 1; padding: 13px 8px;
+    border-radius: 10px; border: 2px solid #e2ddd5;
+    background: #f7f5f0; cursor: pointer;
+    font-size: 15px; font-weight: 800;
+    letter-spacing: 0.06em; text-align: center;
+    transition: all 0.15s; user-select: none; color: #aaa;
+  }
+  .result-btn:hover { border-color: #c5bfb5; color: #666; }
+  .result-btn.active-win  { background: #eaf5ee; border-color: #2e7d4f; color: #2e7d4f; }
+  .result-btn.active-loss { background: #fdf1f0; border-color: #c0392b; color: #c0392b; }
+  .result-btn.active-be   { background: #fff8e6; border-color: #e6ac00; color: #8a6600; }
+
+  .act-row { display: flex; gap: 8px; }
+  .act-btn {
+    flex: 1; padding: 8px; border-radius: 8px;
+    border: 1px solid #e2ddd5; background: #f7f5f0;
+    color: #666; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .act-btn:hover { background: #efe9e0; }
+  .act-btn.copy  { border-color: #4a90d9; color: #3070b0; }
+  .act-btn.reset { border-color: #c0392b; color: #c0392b; }
+</style>
+</head>
+<body>
+<div class="outer">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>TBR checklist</h1>
+      <div class="sub" id="session-sub">Between sessions</div>
+    </div>
+    <div class="clock-area">
+      <div id="clock">--:--:--</div>
+      <div class="clock-label">New York time</div>
+      <div id="no-trade-banner">⛔ NO TRADE — FIRST 12 MIN</div>
+    </div>
+  </div>
+
+  <!-- SWEEP -->
+  <div class="section">
+    <div class="sweep-row">
+      <div class="sweep-btn" id="sw-long" onclick="setSweep('long')">
+        <span class="sw-title">#sweptlowaimhigh</span>
+        <span class="sw-sub">TBR low swept → target TBR high</span>
+      </div>
+      <div class="sweep-btn" id="sw-short" onclick="setSweep('short')">
+        <span class="sw-title">#swepthighaimlow</span>
+        <span class="sw-sub">TBR high swept → target TBR low</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TBR RANGE + ENTRY/STOP -->
+  <div class="section">
+    <div class="fields-grid">
+      <div>
+        <span class="fg-label">TBR Range</span>
+        <div class="field-row"><label>TBR high</label><input type="number" id="tbr-h" placeholder="—" oninput="calcRisk(); syncLinkedTPs()"></div>
+        <div class="field-row"><label>TBR low</label> <input type="number" id="tbr-l" placeholder="—" oninput="calcRisk(); syncLinkedTPs()"></div>
+      </div>
+      <div>
+        <span class="fg-label">Entry / Stop</span>
+        <div class="field-row"><label>Entry</label><input type="number" id="entry" placeholder="—" oninput="calcRisk()"></div>
+        <div class="field-row"><label>Stop</label> <input type="number" id="stop"  placeholder="—" oninput="calcRisk()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAKE PROFITS -->
+  <div class="section">
+    <div class="tp-header">
+      <span class="section-label" style="margin-bottom:0">Take Profits</span>
+      <button class="be-btn" id="be-btn" onclick="toggleBE()">BE</button>
+    </div>
+
+    <!-- TP1 -->
+    <div class="tp-row-item">
+      <span class="tp-lbl">TP1</span>
+      <div class="tp-input-wrap">
+        <input type="number" id="tp1" placeholder="—" oninput="onTPManual('tp1'); calcRR('tp1','rr1'); syncDOL()">
+        <button class="link-btn" id="tp1-tbr-h" onclick="linkTP('tp1','tbr-h')">= TBR H</button>
+        <button class="link-btn" id="tp1-tbr-l" onclick="linkTP('tp1','tbr-l')">= TBR L</button>
+      </div>
+      <span class="tp-rr" id="rr1">—</span>
+    </div>
+
+    <!-- TP2 -->
+    <div class="tp-row-item">
+      <span class="tp-lbl">TP2</span>
+      <div class="tp-input-wrap">
+        <input type="number" id="tp2" placeholder="—" oninput="onTPManual('tp2'); calcRR('tp2','rr2'); syncDOL()">
+        <button class="link-btn" id="tp2-tbr-h" onclick="linkTP('tp2','tbr-h')">= TBR H</button>
+        <button class="link-btn" id="tp2-tbr-l" onclick="linkTP('tp2','tbr-l')">= TBR L</button>
+      </div>
+      <span class="tp-rr" id="rr2">—</span>
+    </div>
+
+    <!-- TP3 / DOL -->
+    <div class="tp-row-item">
+      <span class="tp-lbl dol-lbl">🎯 (DOL)</span>
+      <div class="tp-input-wrap">
+        <input type="number" id="dol" placeholder="—" oninput="onDOLManual(); calcDOLRR()">
+        <button class="link-btn" id="dol-tp1" onclick="linkDOL('tp1')">= TP1</button>
+        <button class="link-btn" id="dol-tp2" onclick="linkDOL('tp2')">= TP2</button>
+      </div>
+      <span class="tp-rr" id="dol-rr">—</span>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-row">
+      <div class="sum-box"><span class="sum-lbl">Risk (pts)</span><span class="sum-val" id="sum-risk">—</span></div>
+      <div class="sum-box"><span class="sum-lbl">TP1</span><span class="sum-val" id="sum-tp1">—</span></div>
+      <div class="sum-box"><span class="sum-lbl">TP2</span><span class="sum-val" id="sum-tp2">—</span></div>
+      <div class="sum-box"><span class="sum-lbl">TP3</span><span class="sum-val" id="sum-tp3">—</span></div>
+    </div>
+  </div>
+
+  <!-- UNTAPPED LIQUIDITY -->
+  <div class="section">
+    <div class="liq-header">
+      <span class="section-label" style="margin-bottom:0">Untapped Liquidity</span>
+    </div>
+    <div class="liq-group-label">Above</div>
+    <div class="liq-items" id="liq-above"></div>
+    <div class="liq-group-label">Below</div>
+    <div class="liq-items" id="liq-below"></div>
+  </div>
+
+  <!-- CORE CHECKS + VERDICT (same card) -->
+  <div class="section">
+    <div class="section-label">Core Checks</div>
+    <div id="chk-list"></div>
+
+    <hr class="section-divider">
+
+    <!-- RESULT -->
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;color:#9e9890;text-transform:uppercase;margin-bottom:12px;">Result</div>
+    <div class="result-btns">
+      <div class="result-btn" id="res-win"  onclick="setResult('win')">🏆 Win</div>
+      <div class="result-btn" id="res-loss" onclick="setResult('loss')">❌ Loss</div>
+      <div class="result-btn" id="res-be"   onclick="setResult('be')">🔒 BE</div>
+    </div>
+
+    <div class="act-row">
+      <button class="act-btn copy" onclick="copyLog()">📋 Copy log</button>
+      <button class="act-btn reset" onclick="resetAll()">↺ Reset</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────
+let sweep = null;
+let beActive = false;
+let dolLinked = null;
+let tpLinked = { tp1: null, tp2: null };
+let tradeResult = null; // 'win' | 'loss' | 'be' | null
+
+// ── LIQUIDITY ────────────────────────────────────────
+const LIQ_ABOVE = ['PDH','Asia H','London H','Pre-mkt H','1H Swing H','HTF FVG ↑','TBR H'];
+const LIQ_BELOW = ['PDL','Asia L','London L','Pre-mkt L','1H Swing L','HTF FVG ↓','TBR L'];
+
+function initLiq() {
+  buildLiqGroup('liq-above', LIQ_ABOVE);
+  buildLiqGroup('liq-below', LIQ_BELOW);
+}
+function buildLiqGroup(id, names) {
+  const c = document.getElementById(id);
+  c.innerHTML = '';
+  names.forEach(name => {
+    const el = document.createElement('div');
+    el.className = 'liq-item';
+    el.innerHTML = `<span class="dot"></span>${name}<span class="dash">—</span>`;
+    el.onclick = () => { el.classList.toggle('swept'); calc(); };
+    c.appendChild(el);
+  });
+}
+
+// ── CHECKLIST ────────────────────────────────────────
+const CHK_DEFS = [
+  { id:'c1', type:'normal',  lbl: () => sweep === 'short' ? 'Sweep tagged meaningful pre-marked liquidity (high)' : 'Sweep tagged meaningful pre-marked liquidity (low)' },
+  { id:'c2', type:'normal',  lbl: () => sweep === 'short' ? '1H forms 3-candle swing HIGH — structure not broken above' : '1H forms 3-candle swing LOW — structure not broken below' },
+  { id:'c3', type:'normal',  lbl: () => sweep === 'short' ? 'Displacement DOWNWARD + bearish gap created' : 'Displacement UPWARD + bullish gap created' },
+  { id:'c4', type:'normal',  lbl: () => sweep === 'short' ? 'OB made in liquidity run (up-close candle = bearish OB)' : 'OB made in liquidity run (down-close candle = bullish OB)' },
+  { id:'c5', type:'normal',  lbl: () => 'Retest of OB / gap / TBR extreme + reaction visible' },
+  { id:'c6', type:'normal',  lbl: () => sweep === 'short' ? 'DOL clear — TBR low untapped' : 'DOL clear — TBR high untapped' },
+  { id:'c7', type:'invalid', lbl: () => 'Invalidation — accepts outside swept side / 1H breaks' },
+];
+
+function initChk() {
+  const list = document.getElementById('chk-list');
+  list.innerHTML = '';
+  CHK_DEFS.forEach(def => {
+    const div = document.createElement('div');
+    div.className = 'chk-item' + (def.type === 'invalid' ? ' invalid-item' : '');
+    div.id = 'row-' + def.id;
+    const prefix = def.type === 'invalid' ? '<span class="warn-icon">⚠️</span>' : '';
+    div.innerHTML = `${prefix}<input type="checkbox" id="${def.id}" onchange="onChk(this)"><label for="${def.id}" id="lbl-${def.id}">${def.lbl()}</label>`;
+    div.onclick = e => { if (e.target.tagName !== 'INPUT') { const cb = div.querySelector('input'); cb.checked = !cb.checked; onChk(cb); } };
+    list.appendChild(div);
+  });
+}
+
+function onChk(cb) {
+  document.getElementById('row-' + cb.id).classList.toggle('done', cb.checked);
+  calc();
+}
+function updateLabels() {
+  CHK_DEFS.forEach(d => { const el = document.getElementById('lbl-' + d.id); if (el) el.textContent = d.lbl(); });
+}
+
+// ── SWEEP ────────────────────────────────────────────
+function setSweep(v) {
+  sweep = v;
+  document.getElementById('sw-long').className  = 'sweep-btn' + (v === 'long'  ? ' long-active'  : '');
+  document.getElementById('sw-short').className = 'sweep-btn' + (v === 'short' ? ' short-active' : '');
+  updateLabels();
+  updateTPButtons();   // hide/show TBR H vs TBR L buttons
+  calcRisk();
+  calc();
+}
+
+// ── TP BUTTON VISIBILITY ─────────────────────────────
+// Long  → targeting HIGH → show "= TBR H" only, hide "= TBR L"
+// Short → targeting LOW  → show "= TBR L" only, hide "= TBR H"
+// None  → show both
+function updateTPButtons() {
+  ['tp1','tp2'].forEach(tpId => {
+    const btnH = document.getElementById(tpId + '-tbr-h');
+    const btnL = document.getElementById(tpId + '-tbr-l');
+    if (sweep === 'long') {
+      btnH.classList.remove('hidden');
+      btnL.classList.add('hidden');
+      // If TBR L was linked, unlink it
+      if (tpLinked[tpId] === 'tbr-l') unlinkTP(tpId);
+    } else if (sweep === 'short') {
+      btnH.classList.add('hidden');
+      btnL.classList.remove('hidden');
+      if (tpLinked[tpId] === 'tbr-h') unlinkTP(tpId);
+    } else {
+      btnH.classList.remove('hidden');
+      btnL.classList.remove('hidden');
+    }
+  });
+}
+
+// ── TP QUICK-FILL ────────────────────────────────────
+function linkTP(tpId, srcId) {
+  const tpInput = document.getElementById(tpId);
+  const btnH = document.getElementById(tpId + '-tbr-h');
+  const btnL = document.getElementById(tpId + '-tbr-l');
+  if (tpLinked[tpId] === srcId) {
+    unlinkTP(tpId);
+  } else {
+    tpLinked[tpId] = srcId;
+    tpInput.setAttribute('readonly', true);
+    btnH.classList.toggle('active-green', srcId === 'tbr-h');
+    btnL.classList.toggle('active-green', srcId === 'tbr-l');
+    tpInput.value = document.getElementById(srcId).value;
+    calcRR(tpId, tpId === 'tp1' ? 'rr1' : 'rr2');
+    syncDOL();
+  }
+}
+
+function unlinkTP(tpId) {
+  tpLinked[tpId] = null;
+  document.getElementById(tpId).removeAttribute('readonly');
+  document.getElementById(tpId + '-tbr-h').classList.remove('active-green');
+  document.getElementById(tpId + '-tbr-l').classList.remove('active-green');
+}
+
+function syncLinkedTPs() {
+  ['tp1','tp2'].forEach(tpId => {
+    const src = tpLinked[tpId];
+    if (src) {
+      document.getElementById(tpId).value = document.getElementById(src).value;
+      calcRR(tpId, tpId === 'tp1' ? 'rr1' : 'rr2');
+    }
+  });
+  syncDOL();
+}
+
+function onTPManual(tpId) {
+  if (tpLinked[tpId]) unlinkTP(tpId);
+}
+
+// ── DOL LINK ─────────────────────────────────────────
+function linkDOL(src) {
+  const dolInput = document.getElementById('dol');
+  if (dolLinked === src) {
+    dolLinked = null;
+    dolInput.removeAttribute('readonly');
+    document.getElementById('dol-tp1').classList.remove('active-purple');
+    document.getElementById('dol-tp2').classList.remove('active-purple');
+  } else {
+    dolLinked = src;
+    dolInput.setAttribute('readonly', true);
+    document.getElementById('dol-tp1').classList.toggle('active-purple', src === 'tp1');
+    document.getElementById('dol-tp2').classList.toggle('active-purple', src === 'tp2');
+    syncDOL();
+  }
+}
+function syncDOL() {
+  if (!dolLinked) return;
+  document.getElementById('dol').value = document.getElementById(dolLinked).value;
+  calcDOLRR();
+}
+function onDOLManual() {
+  if (dolLinked) {
+    dolLinked = null;
+    document.getElementById('dol-tp1').classList.remove('active-purple');
+    document.getElementById('dol-tp2').classList.remove('active-purple');
+    document.getElementById('dol').removeAttribute('readonly');
+  }
+}
+
+// ── RISK / RR ────────────────────────────────────────
+function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function calcRisk() {
+  const e = num('entry'), s = num('stop');
+  document.getElementById('sum-risk').textContent = (e && s) ? Math.abs(e - s).toFixed(2) : '—';
+  calcRR('tp1','rr1'); calcRR('tp2','rr2'); calcDOLRR();
+}
+
+function calcRR(tpId, rrId) {
+  const e = num('entry'), s = num('stop'), tp = num(tpId);
+  const risk = Math.abs(e - s);
+  const rr = (e && s && tp && risk > 0) ? (Math.abs(tp - e) / risk).toFixed(2) + 'R' : '—';
+  document.getElementById(rrId).textContent = rr;
+  document.getElementById('sum-' + tpId).textContent = rr;
+}
+
+function calcDOLRR() {
+  const e = num('entry'), s = num('stop'), d = num('dol');
+  const risk = Math.abs(e - s);
+  const rr = (e && s && d && risk > 0) ? (Math.abs(d - e) / risk).toFixed(2) + 'R' : '—';
+  document.getElementById('dol-rr').textContent = rr;
+  document.getElementById('sum-tp3').textContent = rr;
+  calc();
+}
+
+// ── RESULT ───────────────────────────────────────────
+function setResult(v) {
+  tradeResult = (tradeResult === v) ? null : v; // toggle
+  document.getElementById('res-win').className  = 'result-btn' + (tradeResult === 'win'  ? ' active-win'  : '');
+  document.getElementById('res-loss').className = 'result-btn' + (tradeResult === 'loss' ? ' active-loss' : '');
+  document.getElementById('res-be').className   = 'result-btn' + (tradeResult === 'be'   ? ' active-be'   : '');
+}
+
+// ── BE ───────────────────────────────────────────────
+function toggleBE() {
+  beActive = !beActive;
+  document.getElementById('be-btn').classList.toggle('active', beActive);
+  calc();
+}
+
+// ── CALC (no-op, kept for compatibility with oninput calls) ──
+function calc() {}
+
+// ── CLOCK ────────────────────────────────────────────
+function tick() {
+  const nyNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const h = nyNow.getHours(), m = nyNow.getMinutes(), s = nyNow.getSeconds();
+  const fmt = n => String(n).padStart(2, '0');
+  const clockEl = document.getElementById('clock');
+  clockEl.textContent = `${fmt(h)}:${fmt(m)}:${fmt(s)}`;
+  const danger = m < 12;
+  clockEl.classList.toggle('danger', danger);
+  document.getElementById('no-trade-banner').style.display = danger ? 'block' : 'none';
+
+  const mins = h * 60 + m;
+  const sub = document.getElementById('session-sub');
+  const sessions = [
+    { name: '🟢 London TBR active', s: 72,  e: 132 },
+    { name: '🟡 London TBR — prep', s: 60,  e: 72  },
+    { name: '🟢 NY TBR active',     s: 492, e: 552 },
+    { name: '🟡 NY TBR — prep',     s: 480, e: 492 },
+  ];
+  const match = sessions.find(ss => mins >= ss.s && mins < ss.e);
+  sub.textContent = match ? match.name : 'Between sessions';
+  calc();
+}
+
+// ── COPY LOG ─────────────────────────────────────────
+function copyLog() {
+  const nyStr = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour12: false });
+  const sweepStr = sweep === 'long' ? '#sweptlowaimhigh (LONG)' : sweep === 'short' ? '#swepthighaimlow (SHORT)' : 'Not set';
+  const chkLines = Array.from(document.querySelectorAll('#chk-list .chk-item')).map(row => {
+    const cb = row.querySelector('input'), lbl = row.querySelector('label');
+    return (cb.checked ? '✅' : '⬜') + ' ' + lbl.textContent;
+  }).join('\n');
+  const swept   = [...document.querySelectorAll('.liq-item.swept')].map(b => b.textContent.replace('—','').trim()).join(', ') || 'none';
+  const untapped= [...document.querySelectorAll('.liq-item:not(.swept)')].map(b => b.textContent.replace('—','').trim()).join(', ') || 'none';
+
+  const log = `## TBR Trade Log — ${nyStr} NY
+**Direction:** ${sweepStr}
+**TBR H:** ${num('tbr-h')||'—'} | **TBR L:** ${num('tbr-l')||'—'}
+**Entry:** ${num('entry')||'—'} | **Stop:** ${num('stop')||'—'} | **Risk:** ${document.getElementById('sum-risk').textContent} pts
+**TP1:** ${num('tp1')||'—'} (${document.getElementById('rr1').textContent})${tpLinked.tp1?' [= '+tpLinked.tp1.replace('-',' ').toUpperCase()+']':''}
+**TP2:** ${num('tp2')||'—'} (${document.getElementById('rr2').textContent})${tpLinked.tp2?' [= '+tpLinked.tp2.replace('-',' ').toUpperCase()+']':''}
+**DOL/TP3:** ${num('dol')||'—'} (${document.getElementById('dol-rr').textContent})${dolLinked?' [= '+dolLinked.toUpperCase()+']':''}
+**BE:** ${beActive ? '🔒 SET' : 'Not set'}
+
+### Checklist
+${chkLines}
+
+### Liquidity
+**Untapped:** ${untapped}
+**Swept:** ${swept}
+
+**Result:** ${tradeResult ? tradeResult.toUpperCase() : 'Not recorded'}`;
+
+  navigator.clipboard.writeText(log).then(() => {
+    const btn = document.querySelector('.act-btn.copy');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy log', 2000);
+  });
+}
+
+// ── RESET ────────────────────────────────────────────
+function resetAll() {
+  if (!confirm('Reset all fields?')) return;
+  sweep = null; beActive = false; dolLinked = null;
+  tpLinked = { tp1: null, tp2: null }; tradeResult = null;
+  // Clear result buttons
+  ['res-win','res-loss','res-be'].forEach(id => document.getElementById(id).className = 'result-btn');
+
+  ['tbr-h','tbr-l','entry','stop','tp1','tp2','dol'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = ''; el.removeAttribute('readonly');
+  });
+  ['rr1','rr2','dol-rr'].forEach(id => document.getElementById(id).textContent = '—');
+  ['sum-risk','sum-tp1','sum-tp2','sum-tp3'].forEach(id => document.getElementById(id).textContent = '—');
+
+  document.getElementById('sw-long').className = 'sweep-btn';
+  document.getElementById('sw-short').className = 'sweep-btn';
+  document.getElementById('be-btn').classList.remove('active');
+  document.getElementById('be-badge-v').style.display = 'none';
+
+  ['dol-tp1','dol-tp2','tp1-tbr-h','tp1-tbr-l','tp2-tbr-h','tp2-tbr-l'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active-green','active-purple','hidden');
+  });
+
+  document.querySelectorAll('#chk-list input').forEach(cb => {
+    cb.checked = false;
+    cb.closest('.chk-item').classList.remove('done');
+  });
+  document.querySelectorAll('.liq-item').forEach(el => el.classList.remove('swept'));
+
+  updateLabels();
+  updateTPButtons();
+  calc();
+}
+
+// ── INIT ─────────────────────────────────────────────
+initLiq();
+initChk();
+calc();
+setInterval(tick, 1000);
+tick();
+</script>
+</body>
+</html>
