@@ -345,6 +345,12 @@
     </div>
   </div>
 
+  <!-- TAPPED LIQUIDITY -->
+  <div class="section">
+    <div class="section-label">Tapped Liquidity</div>
+    <div class="liq-items" id="liq-tapped"></div>
+  </div>
+
   <!-- UNTAPPED LIQUIDITY -->
   <div class="section">
     <div class="liq-header">
@@ -390,10 +396,12 @@ let tradeResult = null; // 'win' | 'loss' | 'be' | null
 // ── LIQUIDITY ────────────────────────────────────────
 const LIQ_ABOVE = ['PDH','Asia H','London H','Pre-mkt H','1H Swing H','HTF FVG ↑','TBR H'];
 const LIQ_BELOW = ['PDL','Asia L','London L','Pre-mkt L','1H Swing L','HTF FVG ↓','TBR L'];
+const LIQ_TAPPED_ALL = ['PDH','PDL','Asia H','Asia L','London H','London L','Pre-mkt H','Pre-mkt L','1H Swing H','1H Swing L','HTF FVG ↑','HTF FVG ↓','TBR H','TBR L'];
 
 function initLiq() {
   buildLiqGroup('liq-above', LIQ_ABOVE);
   buildLiqGroup('liq-below', LIQ_BELOW);
+  buildLiqGroup('liq-tapped', LIQ_TAPPED_ALL);
 }
 function buildLiqGroup(id, names) {
   const c = document.getElementById(id);
@@ -415,13 +423,22 @@ const CHK_DEFS = [
   { id:'c4', type:'normal',  lbl: () => sweep === 'short' ? 'OB made in liquidity run (up-close candle = bearish OB)' : 'OB made in liquidity run (down-close candle = bullish OB)' },
   { id:'c5', type:'normal',  lbl: () => 'Retest of OB / gap / TBR extreme + reaction visible' },
   { id:'c6', type:'normal',  lbl: () => sweep === 'short' ? 'DOL clear — TBR low untapped' : 'DOL clear — TBR high untapped' },
-  { id:'c7', type:'invalid', lbl: () => 'Invalidation — accepts outside swept side / 1H breaks' },
+  { id:'c7', type:'normal',  lbl: () => 'KTK marked?' },
+  { id:'c8', type:'normal',  lbl: () => 'HIPPO / gap before sweep?' },
+  { id:'c9', type:'normal',  lbl: () => 'CISD line confirmed?' },
+  { id:'c10', type:'invalid', lbl: () => 'Invalidation — accepts outside swept side / 1H breaks' },
 ];
 
 function initChk() {
   const list = document.getElementById('chk-list');
   list.innerHTML = '';
-  CHK_DEFS.forEach(def => {
+  CHK_DEFS.forEach((def, i) => {
+    // Add divider before KTK / HIPPO / CISD group
+    if (def.id === 'c7') {
+      const hr = document.createElement('hr');
+      hr.className = 'section-divider';
+      list.appendChild(hr);
+    }
     const div = document.createElement('div');
     div.className = 'chk-item' + (def.type === 'invalid' ? ' invalid-item' : '');
     div.id = 'row-' + def.id;
@@ -621,8 +638,8 @@ function copyLog() {
     const cb = row.querySelector('input'), lbl = row.querySelector('label');
     return (cb.checked ? '✅' : '⬜') + ' ' + lbl.textContent;
   }).join('\n');
-  const swept   = [...document.querySelectorAll('.liq-item.swept')].map(b => b.textContent.replace('—','').trim()).join(', ') || 'none';
-  const untapped= [...document.querySelectorAll('.liq-item:not(.swept)')].map(b => b.textContent.replace('—','').trim()).join(', ') || 'none';
+  const swept   = [...document.querySelectorAll('#liq-tapped .liq-item.swept')].map(b => b.textContent.replace('—','').trim()).join(', ') || 'none';
+  const untapped= [...document.querySelectorAll('#liq-above .liq-item:not(.swept), #liq-below .liq-item:not(.swept)')].map(b => b.textContent.replace('—','').trim()).join(', ') || 'none';
 
   const log = `## TBR Trade Log — ${nyStr} NY
 **Direction:** ${sweepStr}
